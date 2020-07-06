@@ -11,6 +11,7 @@
     "core-js": "^3.6.5",
     "eos-transit": "^4.0.7",
     "eos-transit-scatter-provider": "^4.0.7",
+    "eosjs": "^20.0.3",
     "vue": "^2.6.11",
     "vuetify": "^2.2.11"
   },
@@ -39,7 +40,10 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "no-console": "off",
+      "no-unused-vars": "off"
+    }
   },
   "browserslist": [
     "> 1%",

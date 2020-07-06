@@ -3262,7 +3262,7 @@ eosjs-ecc@4.0.7:
     ecurve "1.0.5"
     randombytes "2.0.5"
 
-eosjs@^20.0.0:
+eosjs@^20.0.0, eosjs@^20.0.3:
   version "20.0.3"
   resolved "https://registry.yarnpkg.com/eosjs/-/eosjs-20.0.3.tgz#f3ac1fa119b76dd07bf2825ad27342f6502a533b"
   integrity sha512-h0WSxsDo7AHz5IzpbQDrzyT/CYmbBDtFiiolTdtGd2FdKXEa6LDER4WbNp4qxCY7kD65KeG3knkGmOOFGbPJxw==

@@ -1,5 +1,6 @@
 import { initAccessContext } from 'eos-transit';
 import scatter from 'eos-transit-scatter-provider';
+import {JsonRpc} from 'eosjs';
 
     
     // We need to initialize the so called "access context" first,
@@ -9,7 +10,8 @@ import scatter from 'eos-transit-scatter-provider';
     // and tracking state of connected wallets.
     
     // We're using our own test network as an example here.
-const maincontract = "telostimer11";
+const mainrpc = new JsonRpc('https://api.telosfoundation.io:443');
+    const maincontract = "telostimer11";
 const network = {
     blockchain:'telos',
     chainId:'4667b205c6838ef70ff7988f6e8257e8be0e1284a2f59699054a018f743b1d11',
@@ -75,7 +77,7 @@ async function loginLedgerAndSetPermission() {
       // If discover returned multiple acconts then you'll need to promot the user to select which account he'd like to use. 
       // accountName, authorization are taken from the  discoveryData object. See the example of this object further down on this page.
     
-      await wallet.login(accountName, authorization)
+      await wallet.login('accountName', 'authorization')
     
     } else {
     
@@ -84,7 +86,8 @@ async function loginLedgerAndSetPermission() {
       // and for WAL to fetch the EOS account data for us)
       await wallet.login(); 
     }
-      
+    const { accountName, permission } = wallet.auth
+    const account = { name: accountName, authority: permission }
 // await wallet.eosApi.transact({
 //     actions: [{
 //         account: 'eosio',
@@ -123,27 +126,31 @@ async function loginLedgerAndSetPermission() {
 //     blocksBehind: 3,
 //     expireSeconds: 30,
 // });
-    const perms = await getNewPermissions(accountName)
-    console.log('New permissions =>', JSON.stringify(perms))
-    if(!perms.find(perm => perm.perm_name === 'eosio.code')) return "Already exists"
+    const rpc = wallet.eosApi.rpc
+    // console.log('eos: ', mainrpc)
+    const perms = await getNewPermissions(mainrpc, accountName)
+    console.log('perms: ', perms)
+    // console.log('New permissions =>', JSON.stringify(perms))
+    // if(!perms.find(perm => perm.perm_name === 'eosio.code')) console.log( "Already exists")
 
-    const updateAuthResult = await wallet.eosApi.transaction(tr => {
+    // const updateAuthResult = await wallet.eosApi.transaction(tr => {
 
-        for(const perm of perms) {
+    //     // for(const perm of perms) {
 
-            tr.updateauth({
-                account: accountName,
-                permission: perm.perm_name,
-                parent: perm.parent,
-                auth: perm.required_auth
-            }, {authorization: `${accountName}@owner`})
+    //     //     tr.updateauth({
+    //     //         account: accountName,
+    //     //         permission: perm.perm_name,
+    //     //         parent: perm.parent,
+    //     //         auth: perm.required_auth
+    //     //     }, {authorization: `${accountName}@owner`})
 
-        }
-    })
+    //     // }
+    // })
         
 }
 
-async function getNewPermissions(accountName) {
+async function getNewPermissions(eos, accountName) {
+    // console.log('eos: ', eos, 'accountName: ', accountName)
     const account = await eos.getAccount(accountName)
     const perms = JSON.parse(JSON.stringify(account.permissions))
     return perms
