@@ -53,7 +53,7 @@
     beforeUpdate() {
         const concateAll = arr => arr.reduce((acc, curr) => acc.concat(curr))
         if(this.accounts === null) {
-          console.log('keyToAccounts: ', this.keyToAccountMap)
+          console.log('keyToAccounts: ', JSON.stringify(this.keyToAccountMap))
           const prepared = concateAll(this.keyToAccountMap.map(acc => acc.accounts))
           this.accounts = prepared.map(acc => ({
               text: `${acc.account}@${acc.authorization}`,

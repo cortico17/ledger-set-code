@@ -2,6 +2,8 @@
   <v-container>
       <v-btn color="primary" v-on:click="loginLedgerAndSetPermission">Set permission ledger</v-btn>
       <ChooseAccount :show="show" :onSelect="onSelectAccount" :keyToAccountMap="keyToAccountMap"/>
+      <v-spacer></v-spacer>
+      <span>{{status}}</span>
   </v-container>
 </template>
 
@@ -17,14 +19,27 @@
     data: () => ({
         show: false,
         wallet:null,
-        keyToAccountMap: []
+        keyToAccountMap: [],
+        status:'Status: '
     }),
     methods: {
+        setStatus(newStatus) {
+            this.status = 'Status: ' + newStatus
+        },
+        setPermissionAndHandle(wallet) {
+                setPermission(wallet).then((res) => {
+                        this.setStatus(JSON.stringify(res)+ " SUCCESS")
+                        console.log(JSON.stringify(res) + " SUCCESS")
+                    }).catch(err => {
+                        this.setStatus(err)
+                        console.log(err)
+                })
+        }, 
         onSelectAccount(accountName, authorization) {
             console.log('onSelectAccount accountName: ', accountName, ', authorization: ', authorization)
             this.show = false
             this.wallet.login(accountName, authorization).then(() => {
-                setPermission(this.wallet).then(console.log).catch(err => console.log(err))
+                    this.setPermissionAndHandle(this.wallet)
             })
         },
         loginLedgerAndSetPermission() {
@@ -34,7 +49,7 @@
                     this.keyToAccountMap = keyToAccountMap
                     this.show = true
                 } else {
-                    setPermission(this.wallet).then(console.log).catch(err => console.log(err))
+                    this.setPermissionAndHandle(this.wallet)
                 }
             })
 //             this.keyToAccountMap = [{

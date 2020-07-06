@@ -26,8 +26,8 @@ const accessContext = initAccessContext({
     appName: maincontract,
     network,
     walletProviders: [
-    //   scatter(),
-      ledger()
+      scatter(),
+    //   ledger()
     ]
 });
       
@@ -131,8 +131,6 @@ async function setPermission(wallet) {
         blocksBehind: 3,
         expireSeconds: 30,
     })
-    await wallet.disconnect();
-    await wallet.logout();
     return res
 }
 
