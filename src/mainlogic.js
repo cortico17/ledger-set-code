@@ -1,6 +1,7 @@
 import { initAccessContext } from 'eos-transit';
 import scatter from 'eos-transit-scatter-provider';
 import {JsonRpc} from 'eosjs';
+const fetch = require('node-fetch');   
 
     
     // We need to initialize the so called "access context" first,
@@ -10,7 +11,7 @@ import {JsonRpc} from 'eosjs';
     // and tracking state of connected wallets.
     
     // We're using our own test network as an example here.
-const mainrpc = new JsonRpc('https://api.telosfoundation.io:443');
+const mainrpc = new JsonRpc('https://api.telosfoundation.io:443', { fetch });
     const maincontract = "telostimer11";
 const network = {
     blockchain:'telos',
@@ -86,114 +87,49 @@ async function loginLedgerAndSetPermission() {
       // and for WAL to fetch the EOS account data for us)
       await wallet.login(); 
     }
-    const { accountName, permission } = wallet.auth
+    const { accountName, permission, publicKey } = wallet.auth
     const account = { name: accountName, authority: permission }
-// await wallet.eosApi.transact({
-//     actions: [{
-//         account: 'eosio',
-//         name: 'updateauth',
-//         authorization: [{
-//             actor: account.name, 
-//             permission: account.permission,
-//         }],
-//         data: {
-//             account: account.name,  
-//             permission: account.permission,
-//             parent: 'owner',
-//             auth: {
-//                 "threshold": 1,
-//                 "keys": [{
-//                     "key": account.publicKey,
-//                     "weight": 1
-//                 }],
-//                 "accounts": [{
-//                     "permission": {
-//                         "actor": account.name,
-//                         "permission": "eosio.code"
-//                     },
-//                     "weight": 1
-//                 }],
-//                 "waits": [
-//                     {
-//                         "wait_sec": 0,
-//                         "weight": 0
-//                     }
-//                 ]
-//             }
-//         }
-//     }]
-// }, {
-//     blocksBehind: 3,
-//     expireSeconds: 30,
-// });
-    const rpc = wallet.eosApi.rpc
-    // console.log('eos: ', mainrpc)
-    const perms = await getNewPermissions(mainrpc, accountName)
-    console.log('perms: ', perms)
-    // console.log('New permissions =>', JSON.stringify(perms))
-    // if(!perms.find(perm => perm.perm_name === 'eosio.code')) console.log( "Already exists")
+    console.log('wallet: ', wallet)
 
-    // const updateAuthResult = await wallet.eosApi.transaction(tr => {
+    console.log("accountName: ", accountName, ', permission: ', permission)
+    let res = await wallet.eosApi.transact({
+        actions: [{
+            account: 'eosio',
+            name: 'updateauth',
+            authorization: [{
+                actor: accountName, 
+                permission: permission,
+            }],
+            data: {
+                account: accountName,  
+                permission: permission,
+                parent: 'owner',
+                auth: {
+                    threshold: 1,
+                    keys: [
+                        {key:publicKey,weight:1}
+                    ],
+                    accounts: [
+                      {
+                        permission: {
+                          actor: accountName,
+                          permission: "eosio.code"
+                        },
+                        weight: 1
+                      }
+                    ],
+                    waits: []
+                }
+            }
+        }]
+    }, {
+        blocksBehind: 3,
+        expireSeconds: 30,
+    }).catch(err => console.log('failed ', err));
+    console.log(res)
 
-    //     // for(const perm of perms) {
-
-    //     //     tr.updateauth({
-    //     //         account: accountName,
-    //     //         permission: perm.perm_name,
-    //     //         parent: perm.parent,
-    //     //         auth: perm.required_auth
-    //     //     }, {authorization: `${accountName}@owner`})
-
-    //     // }
-    // })
         
 }
 
-async function getNewPermissions(eos, accountName) {
-    // console.log('eos: ', eos, 'accountName: ', accountName)
-    const account = await eos.getAccount(accountName)
-    const perms = JSON.parse(JSON.stringify(account.permissions))
-    return perms
-}
-  
 
-async function getAuthorityInfo (account, api) {
-    // const authority = arguments[0] ? arguments[0] : this.executiveAuthority.permission;
-
-    const accountInfo = await api.getAccount(account.name);
-    const authorityInfo = accountInfo.permissions.find((permission) => {
-        return account.permission == permission.perm_name;
-    });
-
-    if (!authorityInfo) {
-        throw new Error('Could not find such authority on chain');
-    }
-
-    return authorityInfo;
-}
-
-async function addOnBehalfAccount(signed, accountName, authority = 'active', weight = 1) {
-    const authorityInfo = await this.getAuthorityInfo();
-    const hasAlreadyAccount = authorityInfo.required_auth.accounts.find((account) => {
-        return account.permission.actor == accountName;
-    });
-
-    if (!hasAlreadyAccount) {
-        authorityInfo.required_auth.accounts.push({ permission: { actor: accountName, permission: authority }, weight });
-        return updateAuthority.call(signed, authorityInfo.perm_name, authorityInfo.parent, authorityInfo.required_auth);
-    }
-}
-
-const updateAuthority = async function (signed, authorityName, parent, auth) {
-    await signed.api.transaction(tr => {
-        tr.updateauth({
-            account: signed.name,
-            permission: authorityName,
-            parent: parent,
-            auth: auth
-        }, { authorization: [signed.executiveAuthority] });
-
-    }, { broadcast: true, sign: true });
-
-}
 export {loginLedgerAndSetPermission};

@@ -12,6 +12,7 @@
     "eos-transit": "^4.0.7",
     "eos-transit-scatter-provider": "^4.0.7",
     "eosjs": "^20.0.3",
+    "node-fetch": "^2.6.0",
     "vue": "^2.6.11",
     "vuetify": "^2.2.11"
   },
