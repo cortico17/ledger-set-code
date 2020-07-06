@@ -26,8 +26,8 @@ const accessContext = initAccessContext({
     appName: maincontract,
     network,
     walletProviders: [
-      scatter(),
-    //   ledger()
+    //   scatter(),
+      ledgesr()
     ]
 });
       
