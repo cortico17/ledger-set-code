@@ -10,6 +10,7 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "eos-transit": "^4.0.7",
+    "eos-transit-ledger-provider": "^4.0.8",
     "eos-transit-scatter-provider": "^4.0.7",
     "eosjs": "^20.0.3",
     "node-fetch": "^2.6.0",

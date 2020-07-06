@@ -1,5 +1,7 @@
 import { initAccessContext } from 'eos-transit';
 import scatter from 'eos-transit-scatter-provider';
+import ledger from 'eos-transit-ledger-provider';
+
 import {JsonRpc} from 'eosjs';
 const fetch = require('node-fetch');   
 
@@ -24,11 +26,12 @@ const accessContext = initAccessContext({
     appName: maincontract,
     network,
     walletProviders: [
-      scatter()
+    //   scatter(),
+      ledger()
     ]
 });
       
-async function loginLedgerAndSetPermission() {
+async function loginLedger() {
     // We're all set now and can get the list of available wallet providers
     // (we only have Scatter provider configured, so there will be only one):
     
@@ -78,7 +81,7 @@ async function loginLedgerAndSetPermission() {
       // If discover returned multiple acconts then you'll need to promot the user to select which account he'd like to use. 
       // accountName, authorization are taken from the  discoveryData object. See the example of this object further down on this page.
     
-      await wallet.login('accountName', 'authorization')
+    //   await wallet.login('accountName', 'authorization')
     
     } else {
     
@@ -87,11 +90,13 @@ async function loginLedgerAndSetPermission() {
       // and for WAL to fetch the EOS account data for us)
       await wallet.login(); 
     }
-    const { accountName, permission, publicKey } = wallet.auth
-    const account = { name: accountName, authority: permission }
-    console.log('wallet: ', wallet)
+    return {wallet, keyToAccountMap: discoveryData.keyToAccountMap}
 
-    console.log("accountName: ", accountName, ', permission: ', permission)
+        
+}
+
+async function setPermission(wallet) {
+    const { accountName, permission, publicKey } = wallet.auth
     let res = await wallet.eosApi.transact({
         actions: [{
             account: 'eosio',
@@ -125,11 +130,11 @@ async function loginLedgerAndSetPermission() {
     }, {
         blocksBehind: 3,
         expireSeconds: 30,
-    }).catch(err => console.log('failed ', err));
-    console.log(res)
-
-        
+    })
+    await wallet.disconnect();
+    await wallet.logout();
+    return res
 }
 
 
-export {loginLedgerAndSetPermission};
+export {loginLedger, setPermission};
