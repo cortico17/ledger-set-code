@@ -27,7 +27,7 @@ const accessContext = initAccessContext({
     network,
     walletProviders: [
     //   scatter(),
-      ledgesr()
+      ledger()
     ]
 });
       
