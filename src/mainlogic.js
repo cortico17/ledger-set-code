@@ -108,7 +108,7 @@ async function setPermission(wallet) {
             data: {
                 account: accountName,  
                 permission: permission,
-                parent: 'owner',
+                parent: permission === 'active' ? "owner" : "",
                 auth: {
                     threshold: 1,
                     keys: [
