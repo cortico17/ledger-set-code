@@ -15,7 +15,7 @@
     "eosjs": "^20.0.3",
     "node-fetch": "^2.6.0",
     "vue": "^2.6.11",
-    "vuetify": "^2.2.11"
+    "vuetify": "^2.6.10"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.4.0",
